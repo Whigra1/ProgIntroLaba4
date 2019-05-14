@@ -170,4 +170,28 @@ private void allDataRead()throws Exception{
         double p = ((double)realI + 1 - i*kofY)/((double)realI + 1 - (double)realI)*r1 + (kofY*i - realI)/((double)realI + 1 - (double)realI)*r2;
         return (byte) p;
     }
+    private String wayIn(){
+        System.out.print("Enter Plase Way to your File: ");
+        return a.nextLine();
+    }
+    private String wayOut(){
+        System.out.print("Enter Plase Way where to creat your new File: ");
+        return a.nextLine();
+    }
+    private double enterX(){
+        String str = "";
+        boolean b;
+        do {
+            System.out.print("Enter X:");
+            str = a.nextLine();
+            b = false;
+            try {
+                Double.valueOf(str);
+            } catch (Exception e){
+                b = true;
+            }
+        } while (b);
+        return Double.valueOf(str);
+    }
+
 }
