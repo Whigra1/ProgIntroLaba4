@@ -20,6 +20,27 @@ public class ImageBearbeiten {
     private byte[][] green;
     private byte[][] blue;
 
+ public ImageBearbeiten(File file) throws Exception {
+        oldFile = file;
+        in = new FileInputStream(file);
+        firstHead = new byte[14];
+        secondHead = new byte[40];
+        startPicture = new byte[4];
+        allDataRead();
+        creatPixelMatrix();
+    }
+
+    public ImageBearbeiten() throws Exception {
+        oldFile = new File(wayIn());
+        in = new FileInputStream(oldFile);
+        firstHead = new byte[14];
+        secondHead = new byte[40];
+        startPicture = new byte[4];
+        allDataRead();
+        creatPixelMatrix();
+        reseizX(enterX());
+    }
+
 private void allDataRead()throws Exception{
         in.read(firstHead);
         in.read(secondHead);
