@@ -75,4 +75,50 @@ private void allDataRead()throws Exception{
             }
         }
     }
+
+    public File reseizX(double sizeX) throws Exception{
+        if(sizeX % 1 > 0){
+            File newFile = new File(wayOut());
+            newFile = doubleX(sizeX, newFile);
+            return newFile;
+        }
+        else {
+            File newFile = new File(wayOut());
+            int newHeight = Math.abs(height) * (int)(sizeX);
+            int newWeight = weight * (int)(sizeX);
+            byte[] newwHeight = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(newHeight).array();
+            byte[] newwWeight = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(newWeight).array();
+            for (short i = 0; i < 4; i++) {
+                secondHead[i + 8] = newwHeight[i];
+                secondHead[i + 4] = newwWeight[i];
+            }
+            FileOutputStream output = new FileOutputStream(newFile);
+            output.write(firstHead);
+            output.write(secondHead);
+            if (extaHead != null) {
+                output.write(extaHead);
+            }
+            int start = 0;
+            if (height > 0) {
+                start = height - 1;
+            }
+            for (int i = start; i >= 0; i--) {
+                for (int l = 0; l < sizeX; l++) {
+                    for (int j = 0; j < weight; j++) {
+                        for (int k = 0; k < sizeX; k++) {
+                            output.write(red[i][j]);
+                            output.write(green[i][j]);
+                            output.write(blue[i][j]);
+                        }
+                    }
+                    if (newWeight % 4 != 0) {
+                        for (int s = 0; s < 4 - (newWeight % 4); s++) {
+                            output.write(0);
+                        }
+                    }
+                }
+            }
+            return newFile;
+        }
+    }
 }
