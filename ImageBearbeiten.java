@@ -121,4 +121,53 @@ private void allDataRead()throws Exception{
             return newFile;
         }
     }
+    private File doubleX(double sizeX, File newFile) throws Exception{
+        int newHeight = (int)(Math.abs(height) * sizeX);
+        int newWeight = (int)(weight * sizeX);
+        byte[][] redNew = new byte[newHeight][newWeight];
+        byte[][] greenNew = new byte[newHeight][newWeight];
+        byte[][] blueNew = new byte[newHeight][newWeight];
+        double kofY = (double) height/(double) newHeight;
+        double kofX = (double) weight/(double)newWeight;
+        for(int i = 0; i < newHeight; i++){
+            for(int l = 0; l < newWeight; l++){
+                int realI = (int)(i * kofY);
+                int realL = (int)(l * kofX);
+                redNew[i][l] = berechnen(realI, realL, i, l, kofX, kofY, red[realI][realL], red[realI][realL + 1], red[realI + 1][realL], red[realI + 1][realL + 1]);
+                greenNew[i][l] = berechnen(realI, realL, i, l, kofX, kofY, green[realI][realL], green[realI][realL + 1], green[realI + 1][realL], green[realI + 1][realL + 1]);
+                blueNew[i][l] = berechnen(realI, realL, i, l, kofX, kofY, blue[realI][realL], blue[realI][realL + 1], blue[realI + 1][realL], blue[realI + 1][realL + 1]);
+            }
+        }
+        byte[] newwHeight = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(newHeight).array();
+        byte[] newwWeight = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(newWeight).array();
+        for (short i = 0; i < 4; i++) {
+            secondHead[i + 8] = newwHeight[i];
+            secondHead[i + 4] = newwWeight[i];
+        }
+        FileOutputStream output = new FileOutputStream(newFile);
+        output.write(firstHead);
+        output.write(secondHead);
+        if (extaHead != null) {
+            output.write(extaHead);
+        }
+            for (int l = newHeight - 1; l >= 0; l--) {
+                for (int j = 0; j < newWeight; j++) {
+                        output.write(redNew[l][j]);
+                        output.write(greenNew[l][j]);
+                        output.write(blueNew[l][j]);
+                }
+                if (3*newWeight % 4 != 0) {
+                    for (int s = 0; s < 4 - (3*newWeight % 4); s++) {
+                        output.write(0);
+                    }
+                }
+            }
+        return newFile;
+    }
+    public byte berechnen(int realI, int realL, int i, int l, double kofX, double kofY, byte b1, byte b2, byte b3, byte b4) {
+        double r1 = ((double)realL + 1 - l*kofX)/((double)realL + 1 - (double)realL)*(double)b1 + (kofX*l - realL)/((double)realL + 1 - realL)*(double)b2;
+        double r2 = ((double)realL + 1 - l*kofX)/((double)realL + 1 - (double)realL)*(double)b3 + (kofX*l - realL)/((double)realL + 1 - realL)*(double)b4;
+        double p = ((double)realI + 1 - i*kofY)/((double)realI + 1 - (double)realI)*r1 + (kofY*i - realI)/((double)realI + 1 - (double)realI)*r2;
+        return (byte) p;
+    }
 }
